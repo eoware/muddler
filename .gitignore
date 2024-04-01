@@ -6,3 +6,4 @@ build
 bin
 testmuddle/*/build
 .vscode/settings.json
+.github/dependabot.yml
