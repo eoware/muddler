@@ -15,15 +15,18 @@ abstract class Package {
 
   abstract def newItem(Map options)
 
-  def Package(String packageType ) {
-    this.e = new Echo()
-    e.echo("Scanning for $packageType")
-    this.basePath = "build${File.separator}filtered${File.separator}src${File.separator}$packageType${File.separator}"
-    this.baseDir = new File(this.basePath)
+  Package(String packageType, Boolean scan = true) {
     this.children = []
-    if (baseDir.exists()) {
-      this.files = this.findFiles()
-      this.createItems()
+    
+    if(scan) {
+      this.e = new Echo()
+      e.echo("Scanning for $packageType")
+      this.basePath = "build${File.separator}filtered${File.separator}src${File.separator}$packageType${File.separator}"
+      this.baseDir = new File(this.basePath)
+      if (baseDir.exists()) {
+        this.files = this.findFiles()
+        this.createItems()
+      }
     }
   }
 

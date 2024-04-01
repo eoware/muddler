@@ -2,9 +2,10 @@ package muddler.mudlet.items
 import groovy.xml.MarkupBuilder
 import groovy.xml.XmlUtil
 import muddler.Echo
+import groovy.xml.XmlSlurper
 
 abstract class Item {
-  def e
+  private def e
 
   def Item(Map options) {
     this.e = new Echo()
@@ -25,6 +26,10 @@ abstract class Item {
   }
   
   abstract def newItem(Map options)
+  
+  def newItem(Item i) {
+    return i
+  }
 
   def truthiness(thing) {
     if (thing?.toBoolean() || thing == "yes") {
