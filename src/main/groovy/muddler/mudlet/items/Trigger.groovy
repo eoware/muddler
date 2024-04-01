@@ -161,10 +161,7 @@ class Trigger extends Item {
 
         for (int i = 0; i < regexCodeList.size(); i++) {
             def pattern = regexCodeList[i].text()
-            //e.echo("From xml zzz: rettype = " + regexCodePropertyList[i].text().getClass().getSimpleName())
-            //e.echo( "From xml zzz: num = " + regexCodePropertyList[i].text())
             def type = numberToPatternType("" + regexCodePropertyList[i].text())
-            //e.echo( "From xml zzz: type = " + type )
             def entry = [pattern: pattern, type: type]
             options.patterns.add(entry)
         }
