@@ -42,7 +42,7 @@ abstract class Item {
   def readScripts(String itemType) {
     if (this.script == "") {
       def path = this.path
-      def fullPath = "build${File.separator}filtered${File.separator}src${File.separator}$itemType${File.separator}$path${File.separator}${this.name.replaceAll(" ", "_")}.lua"
+      def fullPath = "build${File.separator}filtered${File.separator}src${File.separator}$itemType${File.separator}$path${File.separator}${this.name}.lua"
       def scriptFile = new File(fullPath)
       if (scriptFile.exists()) {
         def fname = "$scriptFile" - "build${File.separator}filtered${File.separator}"

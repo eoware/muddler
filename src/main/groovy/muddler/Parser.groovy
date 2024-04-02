@@ -84,9 +84,12 @@ class Parser {
         if (item.isFolder == "yes") {
             File groupDir = new File(packageDir, item.name)
             groupDir.mkdirs()
+            File jsonFile = new File( groupDir, "group.json" )
+
             item.children.each { childItem ->
                 generateItemFiles(groupDir, childItem)
             }
+            setJsonInFile(jsonFile, item)
         } else {
 
             if(item.script) {
@@ -99,6 +102,13 @@ class Parser {
 
             addJsonToFile( jsonFile, item )
         }
+    }
+
+    private static void setJsonInFile( File file, def item )
+    {
+        item.children = null
+
+        file.text = new JsonBuilder(item).toPrettyString()
     }
 
     private static void addJsonToFile( File file, def item)

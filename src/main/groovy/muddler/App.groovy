@@ -150,14 +150,37 @@ class App {
       mkp.xmlDeclaration()
       mkp.yieldUnescaped '<!DOCTYPE MudletPackage>'
       'MudletPackage'(version: "1.001") {
-        mkp.yieldUnescaped scriptP.toXML()
-        mkp.yieldUnescaped aliasP.toXML()
-        mkp.yieldUnescaped timerP.toXML()
+
         mkp.yieldUnescaped triggerP.toXML()
+        mkp.yieldUnescaped timerP.toXML()
+        mkp.yieldUnescaped aliasP.toXML()
+        mkp.yieldUnescaped scriptP.toXML()
         mkp.yieldUnescaped keyP.toXML()
       }
     }
     def mpXML = XmlUtil.serialize(mudletPackage)
+    
+        // Placeholder map
+    def placeholders = [:]
+    int counter = 0
+
+    // Step 1: Extract and replace <script> content
+    def modifiedXmlString = mpXML.replaceAll(/(?s)<script>(.*?)<\/script>/) { match ->
+        String placeholderCounter = String.format("%010d", counter++)
+        String key = "PLACEHOLDER_${placeholderCounter}"
+        placeholders[key] = match[1] // Save the content excluding <script> tags
+        return "<script>${key}</script>" // Replace with placeholder
+    }
+
+    // Step 2: Remove extra blank lines (not inside script tags now)
+    modifiedXmlString = modifiedXmlString.replaceAll("(?m)^\s*\n", "")
+
+    // Step 3: Restore <script> content
+    placeholders.each { key, value ->
+        modifiedXmlString = modifiedXmlString.replace(key, value)
+    }
+    
+    mpXML = modifiedXmlString
     e.echo("XML created successfully, writing it to disk")
     try {
       new File(outputDir, packageName + ".xml").withWriter('UTF-8') { writer ->

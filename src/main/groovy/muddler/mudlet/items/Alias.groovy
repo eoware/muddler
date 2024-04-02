@@ -47,11 +47,11 @@ class Alias extends Item {
     }
     xml."$header" ( isActive : this.isActive, isFolder : this.isFolder ) {
       name this.name
-      mkp.yieldUnescaped "<script>" + this.script + "</script>"
+      mkp.yieldUnescaped "<script>" + this.script.trim() + "</script>"
       command this.command 
       packageName ''
       regex this.regex
-      mkp.yieldUnescaped childString
+      mkp.yieldUnescaped childString.trim()
     }
     return writer.toString()
   }

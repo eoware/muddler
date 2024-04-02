@@ -74,11 +74,11 @@ class Key extends Item {
     xml."$header" (isActive: this.isActive, isFolder: this.isFolder) {
       name this.name
       packageName ''
-      mkp.yieldUnescaped "<script>" + this.script + "</script>"
+      mkp.yieldUnescaped "<script>" + this.script.trim() + "</script>"
       command this.command 
       keyCode this.keyCode
       keyModifier this.keyModifier
-      mkp.yieldUnescaped childString
+      mkp.yieldUnescaped childString.trim()
     }
     return writer.toString()
   }

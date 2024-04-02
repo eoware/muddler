@@ -11,6 +11,7 @@ abstract class Package {
   File baseDir
   List files
   List children
+  String path
   def e
 
   abstract def newItem(Map options)
@@ -39,7 +40,7 @@ abstract class Package {
     }
     childString = childString + "\n"
     xml."$packageName" {
-      mkp.yieldUnescaped childString
+      mkp.yieldUnescaped childString.trim()
     }
     return writer.toString()
   }
@@ -69,15 +70,26 @@ abstract class Package {
         itemPayload.add(newItem(it))
       }
 
+      def builtpath = this.basePath
+
       if (directoriesInPath.isEmpty()) {
         this.children.addAll(itemPayload)
       } else {
         directoriesInPath.each {
+          builtpath = builtpath + "/" + it
+          def grouppath = builtpath + "/group.json"
+          def groupFile = new File(grouppath)
           def properties = [:]
-          properties.isFolder = "yes"
-          properties.name = it
-          properties.path = filePath
+          if( groupFile.exists() ) {
+            properties = new JsonSlurper().parse(groupFile)
+          } 
+          else {
+            properties.isFolder = "yes"
+            properties.name = it
+            properties.path = filePath
+          }
           itemArray.add(newItem(properties))
+
         }
 
         itemArray.add(itemPayload)

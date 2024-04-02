@@ -93,11 +93,11 @@ class Timer extends Item {
     }
     xml."$header"( isActive : this.isActive, isFolder : this.isFolder, isTempTimer: this.isTempTimer, isOffsetTimer: this.isOffsetTimer) {
       name this.name
-      mkp.yieldUnescaped "<script>" + this.script + "</script>"
+      mkp.yieldUnescaped "<script>" + this.script.trim() + "</script>"
       command this.command 
       packageName ''
       time this.time
-      mkp.yieldUnescaped childString
+      mkp.yieldUnescaped childString.trim()
     }
     return writer.toString()
   }

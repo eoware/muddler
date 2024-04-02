@@ -71,10 +71,10 @@ class Script extends Item {
     }
     xml."$header" ( isActive : this.isActive, isFolder : this.isFolder ) {
       name this.name
-      mkp.yieldUnescaped "<script>" + this.script + "</script>"
+      mkp.yieldUnescaped "<script>" + this.script.trim() + "</script>"
       packageName ''
-      mkp.yieldUnescaped eventListString
-      mkp.yieldUnescaped childXML
+      mkp.yieldUnescaped eventListString.trim()
+      mkp.yieldUnescaped childXML.trim()
     }
     return writer.toString()
   }

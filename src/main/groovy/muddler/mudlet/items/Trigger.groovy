@@ -43,7 +43,7 @@ class Trigger extends Item {
 //    (new Echo()).echo("New trigger ----")
     this.script = options.script ?: ""
     if(read) super.readScripts("triggers")
-    this.mCommand = options.command ?: ""
+    this.mCommand = options.mCommand ?: ""
     this.triggerType = 0
     this.isMultiline = super.truthiness(options.multiline)
     this.conditonLineDelta = "0"
@@ -193,29 +193,29 @@ class Trigger extends Item {
     this.children.each {
       childString = childString + it.toXML()
     }
-    def regexCodeString = "<regexCodeList>\n" + this.regexCodeList.join("\n") + "</regexCodeList>"
-    def regexCodePropertyListString = "<regexCodePropertyList>\n" + this.regexCodePropertyList.join("\n") + "</regexCodePropertyList>"
+    def regexCodeString = "<regexCodeList>" + this.regexCodeList.join("") + "</regexCodeList>"
+    def regexCodePropertyListString = "<regexCodePropertyList>" + this.regexCodePropertyList.join("") + "</regexCodePropertyList>"
     def header = "Trigger"
     if (this.isFolder == "yes") {
       header = "TriggerGroup"
     }
     xml."$header" (isActive: this.isActive, isFolder: this.isFolder, isMultiline: this.isMultiline, isPerlSlashGOption: this.isPerlSlashGOption, isColorizerTrigger: this.isColorizerTrigger, isFilterTrigger: this.isFilterTrigger, isColorTrigger: this.isColorTrigger, isColorTriggerFg: this.isColorTriggerFg, isColorTriggerBg: this.isColorTriggerBg) {
-      name this.name
+      name this.name.trim()
       mkp.yieldUnescaped "<script>${this.script}</script>"
-      triggerType this.triggerType
-      conditonLineDelta this.conditonLineDelta
-      mStayOpen this.mStayOpen
-      mCommand this.mCommand
+      triggerType this.triggerType.trim()
+      conditonLineDelta this.conditonLineDelta.trim()
+      mStayOpen this.mStayOpen.trim()
+      mCommand this.mCommand.trim()
       packageName ''
       path this.path
-      mFgColor this.mFgColor
-      mBgColor this.mBgColor
-      mSoundFile this.mSoundFile
-      colorTriggerFgColor this.colorTriggerFgColor
-      colorTriggerBgColor this.colorTriggerBgColor
-      mkp.yieldUnescaped regexCodeString
-      mkp.yieldUnescaped regexCodePropertyListString
-      mkp.yieldUnescaped childString
+      mFgColor this.mFgColor.trim()
+      mBgColor this.mBgColor.trim()
+      mSoundFile this.mSoundFile.trim()
+      colorTriggerFgColor this.colorTriggerFgColor.trim()
+      colorTriggerBgColor this.colorTriggerBgColor.trim()
+      mkp.yieldUnescaped regexCodeString.trim()
+      mkp.yieldUnescaped regexCodePropertyListString.trim()
+      mkp.yieldUnescaped childString.trim()
     }
     return writer.toString()
   }
