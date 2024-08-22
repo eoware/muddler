@@ -3,6 +3,7 @@ import groovy.transform.ToString
 import groovy.xml.MarkupBuilder
 import groovy.xml.XmlUtil
 import muddler.mudlet.items.Item
+import groovy.xml.XmlSlurper
 
 @ToString
 class Script extends Item {
@@ -15,17 +16,43 @@ class Script extends Item {
   List eventHandlerList
   List children
 
-  Script(Map options) {
+ Script(Map options, Boolean read = true) {
     super(options)
     this.eventHandlerList = options.eventHandlerList
     this.script = options.script ?: ""
-    super.readScripts("scripts")
+    if(read) super.readScripts("scripts")
   }
 
   def newItem(Map options) {
     return new Script(options)
   }
   
+    static Script fromXml(String xml) {
+        def xmlSlurper = new XmlSlurper().parseText(xml)
+        Map options = [:]
+
+        options.isActive = xmlSlurper.@isActive.text()
+        options.isFolder = xmlSlurper.@isFolder.text()
+        options.name = xmlSlurper.name.text()
+        options.script = xmlSlurper.script.text()
+        options.packageName = xmlSlurper.packageName.text()
+        options.eventHandlerList = []
+
+        xmlSlurper.eventHandlerList."string".each {
+            options.eventHandlerList.add(it.text())
+        }
+
+        def children = []
+        xmlSlurper.children().findAll { it.name() == 'Script' || it.name() == 'ScriptGroup' }.each { 
+          childNode ->
+            def xmlString = XmlUtil.serialize(childNode)
+            children.add(fromXml(xmlString))
+        }
+        options.children = children
+
+        return new Script(options, false)
+    }
+
   def toXML() {
     def writer = new StringWriter()
     def xml = new MarkupBuilder(writer)
@@ -44,10 +71,10 @@ class Script extends Item {
     }
     xml."$header" ( isActive : this.isActive, isFolder : this.isFolder ) {
       name this.name
-      mkp.yieldUnescaped "<script>" + this.script + "</script>"
+      mkp.yieldUnescaped "<script>" + this.script.trim() + "</script>"
       packageName ''
-      mkp.yieldUnescaped eventListString
-      mkp.yieldUnescaped childXML
+      mkp.yieldUnescaped eventListString.trim()
+      mkp.yieldUnescaped childXML.trim()
     }
     return writer.toString()
   }

@@ -32,7 +32,7 @@ class Button extends Item {
 
   def Button(Map options) {
     super(options)
-    super.readScripts("buttons")
+    if(read) super.readScripts("buttons")
   }
 
   def newItem(Map options) {

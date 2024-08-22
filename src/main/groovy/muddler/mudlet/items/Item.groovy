@@ -2,9 +2,10 @@ package muddler.mudlet.items
 import groovy.xml.MarkupBuilder
 import groovy.xml.XmlUtil
 import muddler.Echo
+import groovy.xml.XmlSlurper
 
 abstract class Item {
-  def e
+  private def e
 
   def Item(Map options) {
     this.e = new Echo()
@@ -25,6 +26,10 @@ abstract class Item {
   }
   
   abstract def newItem(Map options)
+  
+  def newItem(Item i) {
+    return i
+  }
 
   def truthiness(thing) {
     if (thing?.toBoolean() || thing == "yes") {
@@ -37,7 +42,7 @@ abstract class Item {
   def readScripts(String itemType) {
     if (this.script == "") {
       def path = this.path
-      def fullPath = "build${File.separator}filtered${File.separator}src${File.separator}$itemType${File.separator}$path${File.separator}${this.name.replaceAll(" ", "_")}.lua"
+      def fullPath = "build${File.separator}filtered${File.separator}src${File.separator}$itemType${File.separator}$path${File.separator}${this.name}.lua"
       def scriptFile = new File(fullPath)
       if (scriptFile.exists()) {
         def fname = "$scriptFile" - "build${File.separator}filtered${File.separator}"

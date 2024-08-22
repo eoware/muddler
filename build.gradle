@@ -37,6 +37,10 @@ task dockerTest(type:Exec, dependsOn: ['clean', 'shadowJar']) {
   commandLine 'docker', 'build', '-t', "demonnic/muddler:test", '.'
 }
 
+task dockerLocal(type:Exec, dependsOn: ['clean', 'shadowJar']) {
+  commandLine 'docker', 'build', '-t', "muddler:test", '.'
+}
+
 task dockerLatest(type:Exec, dependsOn: ['clean', 'shadowJar']) {
   commandLine 'docker', 'build', '-t', "demonnic/muddler:latest", '.'
 }

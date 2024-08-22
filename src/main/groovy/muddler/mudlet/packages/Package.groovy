@@ -11,19 +11,23 @@ abstract class Package {
   File baseDir
   List files
   List children
+  String path
   def e
 
   abstract def newItem(Map options)
 
-  def Package(String packageType ) {
-    this.e = new Echo()
-    e.echo("Scanning for $packageType")
-    this.basePath = "build${File.separator}filtered${File.separator}src${File.separator}$packageType${File.separator}"
-    this.baseDir = new File(this.basePath)
+  Package(String packageType, Boolean scan = true) {
     this.children = []
-    if (baseDir.exists()) {
-      this.files = this.findFiles()
-      this.createItems()
+    
+    if(scan) {
+      this.e = new Echo()
+      e.echo("Scanning for $packageType")
+      this.basePath = "build${File.separator}filtered${File.separator}src${File.separator}$packageType${File.separator}"
+      this.baseDir = new File(this.basePath)
+      if (baseDir.exists()) {
+        this.files = this.findFiles()
+        this.createItems()
+      }
     }
   }
 
@@ -36,7 +40,7 @@ abstract class Package {
     }
     childString = childString + "\n"
     xml."$packageName" {
-      mkp.yieldUnescaped childString
+      mkp.yieldUnescaped childString.trim()
     }
     return writer.toString()
   }
@@ -66,15 +70,26 @@ abstract class Package {
         itemPayload.add(newItem(it))
       }
 
+      def builtpath = this.basePath
+
       if (directoriesInPath.isEmpty()) {
         this.children.addAll(itemPayload)
       } else {
         directoriesInPath.each {
+          builtpath = builtpath + "/" + it
+          def grouppath = builtpath + "/group.json"
+          def groupFile = new File(grouppath)
           def properties = [:]
-          properties.isFolder = "yes"
-          properties.name = it
-          properties.path = filePath
+          if( groupFile.exists() ) {
+            properties = new JsonSlurper().parse(groupFile)
+          } 
+          else {
+            properties.isFolder = "yes"
+            properties.name = it
+            properties.path = filePath
+          }
           itemArray.add(newItem(properties))
+
         }
 
         itemArray.add(itemPayload)

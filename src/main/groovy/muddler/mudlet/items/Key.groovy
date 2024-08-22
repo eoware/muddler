@@ -3,6 +3,8 @@ import groovy.transform.ToString
 import groovy.xml.MarkupBuilder
 import groovy.xml.XmlUtil
 import muddler.mudlet.items.Item
+import groovy.xml.XmlSlurper
+
 
 @ToString
 class Key extends Item {
@@ -17,7 +19,7 @@ class Key extends Item {
   String keyModifier
   List children
   
-  Key(Map options) {
+ Key(Map options, Boolean read = true) {
     super(options)
     this.script = options.script ?: ''
     super.readScripts('keys')
@@ -33,6 +35,31 @@ class Key extends Item {
     return new Key(options)
   }
 
+   static Key fromXml(String xml) {
+        def xmlSlurper = new XmlSlurper().parseText(xml)
+        Map options = [:]
+
+        options.isActive = xmlSlurper.@isActive.text()
+        options.isFolder = xmlSlurper.@isFolder.text()
+        options.name = xmlSlurper.name.text()
+        options.script = xmlSlurper.script.text()
+        options.command = xmlSlurper.command.text()
+        options.keyCode = xmlSlurper.keyCode.text()
+        options.keyModifier = xmlSlurper.keyModifier.text()
+        options.packageName = xmlSlurper.packageName.text()
+
+        def children = []
+        xmlSlurper.children().each {
+            def xmlString = XmlUtil.serialize(it)
+            if (it.name() == 'Key' || it.name() == 'KeyGroup') {
+                children.add(fromXml(xmlString))
+            }
+        }
+        options.children = children
+
+        return new Key(options, false)
+    }
+
   def toXML() {
     def writer = new StringWriter()
     def xml = new MarkupBuilder(writer)
@@ -47,11 +74,11 @@ class Key extends Item {
     xml."$header" (isActive: this.isActive, isFolder: this.isFolder) {
       name this.name
       packageName ''
-      mkp.yieldUnescaped "<script>" + this.script + "</script>"
+      mkp.yieldUnescaped "<script>" + this.script.trim() + "</script>"
       command this.command 
       keyCode this.keyCode
       keyModifier this.keyModifier
-      mkp.yieldUnescaped childString
+      mkp.yieldUnescaped childString.trim()
     }
     return writer.toString()
   }
