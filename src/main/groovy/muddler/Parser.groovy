@@ -94,7 +94,7 @@ class Parser {
 
             if(item.script) {
                 File itemFile = new File(packageDir, "${item.name}.lua")
-                itemFile.text = item.script ?: "// Empty script"
+                itemFile.text = item.script
                 item.script = ""
             }
             
