@@ -23,6 +23,7 @@ class App {
       g longOpt: 'generate', 'Create a new muddler project by answering some questions.'
       d longOpt: 'default', 'Create a new default muddler template project named MyProject in the MyProject directory'
       p longOpt: 'parse', args: 1, argName: 'filename', 'Parse a package XML file into the source directories.'
+      w longOpt: 'watch', 'Watch the src directory for changes and rebuild the package when they occur'
     }
     def options = cli.parse(args)
     if (!options) {
@@ -54,6 +55,18 @@ class App {
       return
     }
 
+    build()
+
+    if (options.w) {
+      watch()
+      return
+    }
+
+    System.exit(0)
+  }
+
+  static void build() {
+    def e = new Echo()
     def srcDir = new File('./src')
     if (!srcDir.exists()) {
       println "muddler requires a src directory to read your package contents from, and cannot find it. Please see https://github.com/demonnic/muddler#usage for more information on the file layout for muddler."
@@ -256,7 +269,39 @@ class App {
       }
     }
     e.echo("Build completed successfully!")
-    System.exit(0)
+  }
+
+  static Map<String, Long> mapFileModificationTimes(File directory) {
+    def fileModificationTimes = [:]
+    directory.eachFileRecurse { file ->
+      if (file.isFile()) {
+        fileModificationTimes[file.path] = file.lastModified()
+      }
+    }
+    return fileModificationTimes
+  }
+
+  static void watch() {
+    def e = new Echo()
+    def srcDir = new File('./src')
+    if (!srcDir.exists()) {
+      println 'muddler requires a src directory to read your package contents from, and cannot find it. Please see'
+      return
+    }
+
+    def previousFileModificationTimes = mapFileModificationTimes(srcDir)
+
+    while (true) {
+      Thread.sleep(1000)
+
+      def currentFileModificationTimes = mapFileModificationTimes(srcDir)
+
+      if (currentFileModificationTimes != previousFileModificationTimes) {
+        e.echo('Change detected in source directory')
+        build()
+        previousFileModificationTimes = currentFileModificationTimes
+      }
+    }
   }
 
   static void parse(String filename) {
